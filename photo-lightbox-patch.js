@@ -9,9 +9,22 @@
   document.body.appendChild(box);
   const big=box.querySelector('img');
 
+  function getRealSrc(img){
+    if(!img)return '';
+    const raw=(img.getAttribute('src')||img.getAttribute('data-src')||'').trim();
+    if(!raw)return '';
+    if(raw==='/'||raw===location.href||raw===location.pathname)return '';
+    return raw;
+  }
   function closeLightbox(){box.classList.remove('open');big.removeAttribute('src');document.body.style.overflow=''}
-  function openLightbox(src,alt){if(!src)return;big.src=src;big.alt=alt||'Foto ampliada del trabajo';box.classList.add('open');document.body.style.overflow='hidden'}
-  window.openResolvePhoto=openLightbox;
+  function openLightboxFromImage(img){
+    const src=getRealSrc(img);
+    if(!src)return;
+    big.src=src;
+    big.alt=img.alt||'Foto ampliada del trabajo';
+    box.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
   window.closeResolvePhoto=closeLightbox;
 
   box.querySelector('button').onclick=closeLightbox;
@@ -22,9 +35,11 @@
     if(!img || img.tagName!=='IMG' || box.contains(img)) return;
     const gallery=document.getElementById('profileGallery');
     if(gallery && gallery.contains(img)){
+      const src=getRealSrc(img);
+      if(!src)return;
       e.preventDefault();
       e.stopPropagation();
-      openLightbox(img.currentSrc||img.src,img.alt);
+      openLightboxFromImage(img);
     }
   },true);
 
@@ -35,8 +50,10 @@
       const gallery=document.getElementById('profileGallery');
       if(gallery){
         gallery.querySelectorAll('img').forEach(function(img){
+          const src=getRealSrc(img);
+          if(!src)return;
           img.setAttribute('data-professional-photo','1');
-          img.onclick=function(ev){ev.preventDefault();ev.stopPropagation();openLightbox(img.currentSrc||img.src,img.alt)};
+          img.onclick=function(ev){ev.preventDefault();ev.stopPropagation();openLightboxFromImage(img)};
         });
       }
     };
