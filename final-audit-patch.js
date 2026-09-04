@@ -82,7 +82,7 @@
       const jobIds=[...new Set(apps.map(a=>a.job_id))];
       const {data:jobsForApps}=await sb.from('job_posts').select('id,title,trade,zone').in('id',jobIds);
       const jm=new Map((jobsForApps||[]).map(j=>[j.id,j]));
-      html+='<h3>Mis postulaciones</h3>'+apps.map(a=>{const j=jm.get(a.job_id)||{};const se={pending:'Pendiente',accepted:'Aceptada',rejected:'No seleccionada'};return `<div class="proCard"><b>${esc(j.title||'Postulación')}</b><div class="meta">${esc(j.trade||'')} ${j.zone?'· '+esc(j.zone):''}</div><div class="meta">Estado: ${esc(se[a.status]||a.status)} · ${new Date(a.created_at).toLocaleDateString('es-AR')}</div>${a.message?`<div class="mini">${esc(a.message)}</div>`:''}</div>`}).join('');
+      html+='<h3>Mis postulaciones</h3>'+apps.map(a=>{const j=jm.get(a.job_id)||{};const se={sent:'Enviada',reviewed:'Revisada',contacted:'Contactada',closed:'Cerrada'};return `<div class="proCard"><b>${esc(j.title||'Postulación')}</b><div class="meta">${esc(j.trade||'')} ${j.zone?'· '+esc(j.zone):''}</div><div class="meta">Estado: ${esc(se[a.status]||a.status)} · ${new Date(a.created_at).toLocaleDateString('es-AR')}</div>${a.message?`<div class="mini">${esc(a.message)}</div>`:''}</div>`}).join('');
     }
 
     const {data:myJobs}=await sb.from('job_posts').select('id,title,trade,zone,is_active,created_at').eq('employer_id',u.id).order('created_at',{ascending:false});
@@ -90,7 +90,8 @@
       html+='<h3>Mis publicaciones en Bolsa de empleo</h3>';
       for(const j of myJobs){
         const {data:received}=await sb.from('job_applications').select('id,applicant_name,applicant_phone,message,status,created_at').eq('job_id',j.id).order('created_at',{ascending:false});
-        html+=`<div class="proCard"><b>${esc(j.title)}</b><div class="meta">${esc(j.trade||'General')} · ${esc(j.zone||'Sin zona')} · ${j.is_active?'Publicada':'Cerrada'} · ${new Date(j.created_at).toLocaleDateString('es-AR')}</div>${received?.length?`<div class="auditBadge">${received.length} postulacion${received.length===1?'':'es'}</div>`+received.map(a=>`<div class="info"><b>${esc(a.applicant_name||'Postulante')}</b><br>📱 ${esc(a.applicant_phone||'Sin WhatsApp')}<br>${a.message?esc(a.message):''}</div>`).join(''):'<div class="mini">Todavía no hay postulaciones.</div>'}</div>`;
+        const se={sent:'Enviada',reviewed:'Revisada',contacted:'Contactada',closed:'Cerrada'};
+        html+=`<div class="proCard"><b>${esc(j.title)}</b><div class="meta">${esc(j.trade||'General')} · ${esc(j.zone||'Sin zona')} · ${j.is_active?'Publicada':'Cerrada'} · ${new Date(j.created_at).toLocaleDateString('es-AR')}</div>${received?.length?`<div class="auditBadge">${received.length} postulacion${received.length===1?'':'es'}</div>`+received.map(a=>`<div class="info"><b>${esc(a.applicant_name||'Postulante')}</b><br>📱 ${esc(a.applicant_phone||'Sin WhatsApp')}<br>Estado: ${esc(se[a.status]||a.status)}<br>${a.message?esc(a.message):''}</div>`).join(''):'<div class="mini">Todavía no hay postulaciones.</div>'}</div>`;
       }
     }
 
