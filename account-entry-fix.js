@@ -2,13 +2,25 @@
   async function goAccount(){
     try{
       const {data:{user}}=await sb.auth.getUser();
-      if(!user){ if(typeof window.show==='function') return window.show('login'); if(typeof show==='function') return show('login'); return; }
+      if(!user){
+        if(typeof window.openStableLogin==='function') return window.openStableLogin();
+        if(typeof window.show==='function') return window.show('login');
+        if(typeof show==='function') return show('login');
+        return;
+      }
       const {data:p}=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();
       if(p?.role==='admin'){ window.location.assign('/admin.html'); return; }
       if(typeof window.loadAccount==='function') return window.loadAccount();
       if(typeof window.show==='function') return window.show('account');
       if(typeof show==='function') return show('account');
-    }catch(e){ console.error('No se pudo abrir Mi cuenta',e); try{ if(typeof window.show==='function') window.show('login'); else if(typeof show==='function') show('login'); }catch(_){} }
+    }catch(e){
+      console.error('No se pudo abrir Mi cuenta',e);
+      try{
+        if(typeof window.openStableLogin==='function') return window.openStableLogin();
+        if(typeof window.show==='function') window.show('login');
+        else if(typeof show==='function') show('login');
+      }catch(_){}
+    }
   }
   window.goAccount=goAccount;
   function isExternalOrSocial(el){
