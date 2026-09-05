@@ -1,36 +1,38 @@
 (()=>{
   function safeToggle(btn){
-    const wrap=btn.closest('.field,.inputWrap,.password-wrap,.passwordField,form,div');
+    const wrap=btn.closest('.field,.inputWrap,.password-wrap,.passwordField,.resolvePassWrap,form,div');
     let input=null;
     const targetId=btn.dataset.target||btn.getAttribute('aria-controls');
     if(targetId) input=document.getElementById(targetId);
     if(!input&&wrap) input=wrap.querySelector('input[type="password"],input[data-password],input[type="text"][data-was-password="1"]');
-    if(!input){
-      const all=[...document.querySelectorAll('input[type="password"],input[data-was-password="1"]')];
-      input=all.find(i=>i.getBoundingClientRect().top<=btn.getBoundingClientRect().bottom+40&&i.getBoundingClientRect().bottom>=btn.getBoundingClientRect().top-40)||all[0];
-    }
     if(!input)return;
     const show=input.type==='password';
     input.type=show?'text':'password';
     input.dataset.wasPassword='1';
     btn.textContent=show?'🙈':'👁️';
     btn.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');
-    input.focus({preventScroll:true});
+    try{input.focus({preventScroll:true})}catch(_){input.focus()}
+  }
+
+  function patchInput(input){
+    if(input.dataset.mobilePasswordReady==='1')return;
+    input.dataset.mobilePasswordReady='1';
+    input.style.fontSize='16px';
+    input.style.minHeight='48px';
+    input.style.pointerEvents='auto';
+    input.style.touchAction='manipulation';
+    input.style.webkitUserSelect='text';
+    input.style.userSelect='text';
+    input.style.opacity='1';
+    input.readOnly=false;
+    input.disabled=false;
+    const context=(input.id+' '+input.name+' '+input.placeholder+' '+(input.closest('form,section,div')?.textContent||'')).toLowerCase();
+    input.setAttribute('autocomplete',/crear|registr|repet|confirm|nueva|new/.test(context)?'new-password':'current-password');
+    input.addEventListener('touchstart',()=>{}, {passive:true});
   }
 
   function patch(){
-    document.querySelectorAll('input[type="password"],input[data-was-password="1"]').forEach(input=>{
-      input.style.fontSize='16px';
-      input.style.minHeight='48px';
-      input.setAttribute('autocomplete',input.id&&/repeat|confirm/i.test(input.id)?'new-password':'current-password');
-      input.addEventListener('focus',()=>{
-        setTimeout(()=>{
-          const r=input.getBoundingClientRect();
-          const vh=window.visualViewport?.height||window.innerHeight;
-          if(r.bottom>vh-20||r.top<80) input.scrollIntoView({block:'center',behavior:'smooth'});
-        },250);
-      },{passive:true});
-    });
+    document.querySelectorAll('input[type="password"],input[data-was-password="1"]').forEach(patchInput);
 
     [...document.querySelectorAll('button,a')].forEach(btn=>{
       const txt=(btn.textContent||'').trim();
@@ -46,10 +48,9 @@
       btn.style.minHeight='44px';
     });
 
-    const loginSection=document.getElementById('login')||document.querySelector('[data-view="login"],.login,.loginCard');
-    if(loginSection){
-      loginSection.querySelectorAll('input,button').forEach(el=>{el.style.touchAction='manipulation'});
-    }
+    document.querySelectorAll('#login,#signup,#register,[data-view="login"],[data-view="signup"],.login,.loginCard,.resolveLoginOverlay').forEach(section=>{
+      section.querySelectorAll('input,button').forEach(el=>{el.style.touchAction='manipulation';el.style.pointerEvents='auto'});
+    });
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch);else patch();
