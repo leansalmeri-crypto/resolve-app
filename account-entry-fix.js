@@ -11,14 +11,22 @@
     }catch(e){ console.error('No se pudo abrir Mi cuenta',e); try{ if(typeof window.show==='function') window.show('login'); else if(typeof show==='function') show('login'); }catch(_){} }
   }
   window.goAccount=goAccount;
-  function isAccountTrigger(el){
+  function isExternalOrSocial(el){
     if(!el)return false;
+    const a=el.closest?.('a[href]');
+    if(!a)return false;
+    const href=a.getAttribute('href')||'';
+    return a.id==='resolve-ig'||a.id==='resolve-fb'||/^https?:\/\//i.test(href)||/instagram\.com|facebook\.com/i.test(href);
+  }
+  function isAccountTrigger(el){
+    if(!el||isExternalOrSocial(el))return false;
     const txt=(el.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
     const aria=(el.getAttribute?.('aria-label')||'').toLowerCase();
     const title=(el.getAttribute?.('title')||'').toLowerCase();
     return (txt.includes('ingresar')&&txt.includes('cuenta')) || txt==='mi cuenta' || aria.includes('mi cuenta') || title.includes('mi cuenta');
   }
   document.addEventListener('click',e=>{
+    if(isExternalOrSocial(e.target))return;
     let el=e.target;
     while(el&&el!==document.body&&!isAccountTrigger(el)) el=el.parentElement;
     if(el&&isAccountTrigger(el)){
