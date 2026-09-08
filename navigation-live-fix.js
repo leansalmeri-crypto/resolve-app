@@ -1,18 +1,9 @@
 (()=>{
  if(window.__resolveNavStable)return;window.__resolveNavStable=1;
- function nativeShow(id){
-   try{if(typeof window.show==='function'){window.show(id);return true}if(typeof show==='function'){show(id);return true}}catch(e){console.error('RESOLVÉ navegación',e)}return false;
- }
- function go(target){
-   if(target==='home')return nativeShow('home');
-   if(target==='search'){const ok=nativeShow('home');setTimeout(()=>document.getElementById('searchBox')?.scrollIntoView({behavior:'smooth',block:'start'}),50);return ok}
-   if(target==='jobs')return nativeShow('jobs');
-   if(target==='professional')return nativeShow('professional');
-   if(target==='request')return nativeShow('request');
-   if(target==='account'){try{if(typeof window.openAccount==='function'){window.openAccount();return true}if(typeof openAccount==='function'){openAccount();return true}}catch(e){console.error(e)}return false}
-   return false;
- }
- // La app original ya define los botones. No interceptamos eventos globales.
- // Este objeto queda como API de respaldo para los controles agregados por los parches.
+ function nativeShow(id){try{if(typeof window.show==='function'){window.show(id);return true}if(typeof show==='function'){show(id);return true}}catch(e){console.error('RESOLVÉ navegación',e)}return false}
+ function go(target){if(target==='home')return nativeShow('home');if(target==='search'){const ok=nativeShow('home');setTimeout(()=>document.getElementById('searchBox')?.scrollIntoView({behavior:'smooth',block:'start'}),40);return ok}if(target==='jobs')return nativeShow('jobs');if(target==='professional')return nativeShow('professional');if(target==='request')return nativeShow('request');if(target==='account'){try{if(typeof window.openAccount==='function'){window.openAccount();return true}if(typeof openAccount==='function'){openAccount();return true}}catch(e){console.error(e)}return false}return false}
  window.resolveGo=go;
+ function bind(id,fn){const el=document.getElementById(id);if(!el||el.dataset.resolveBound)return;el.dataset.resolveBound='1';el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();fn()})}
+ function repair(){bind('qHome',()=>go('home'));bind('qJobs',()=>go('jobs'));bind('qPro',()=>go('professional'));bind('nHome',()=>go('home'));bind('nJobs',()=>go('jobs'));bind('nAccount',()=>go('account'));const nav=document.querySelector('nav');if(nav){[...nav.querySelectorAll('button')].forEach(b=>{const t=(b.textContent||'').trim().toLowerCase();if(t.includes('buscar')&&!b.dataset.resolveBound){b.dataset.resolveBound='1';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();go('search')})}})}document.querySelectorAll('button').forEach(b=>{const t=(b.textContent||'').trim().toLowerCase();if((t==='mi cuenta'||t.includes('ingresar a mi cuenta'))&&!b.dataset.resolveBound){b.dataset.resolveBound='1';b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();go('account')})}})}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',repair);else repair();new MutationObserver(repair).observe(document.documentElement,{childList:true,subtree:true});
 })();
