@@ -1,1 +1,1 @@
-{"cleanUrls":true,"trailingSlash":false,"redirects":[{"source":"/","destination":"/v3/landing.html","permanent":false}]}
+{"cleanUrls":true,"trailingSlash":false,"redirects":[{"source":"/","destination":"/v3/landing.html","permanent":false},{"source":"/v3/welcome.html","destination":"/v3/app.html","permanent":false}]}
