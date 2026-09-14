@@ -1,0 +1,13 @@
+// Integración visual complementaria RESOLVÉ v3
+(function(){
+function insertUI(){
+ const guest=document.getElementById('guest'); if(guest&&!document.getElementById('forgotBtn')){const b=document.createElement('button');b.id='forgotBtn';b.className='secondary';b.textContent='¿Olvidaste tu contraseña?';b.onclick=resolveForgotPassword;guest.querySelector('.card').appendChild(b)}
+ const jobs=document.getElementById('jobs');if(jobs&&!document.getElementById('jobCreateCard')){const c=document.createElement('div');c.id='jobCreateCard';c.className='card hidden';c.innerHTML='<span class="badge">PUBLICAR BÚSQUEDA</span><h2>Busco personal</h2><input id="jobTitle" placeholder="Puesto o título"><input id="jobTrade" placeholder="Rubro / oficio"><input id="jobZone" placeholder="Zona"><textarea id="jobDescription" placeholder="Describí el puesto y lo que necesitás"></textarea><button onclick="resolvePublishJob()">Publicar búsqueda</button><div id="jobMsg"></div><h3>Mis publicaciones</h3><div id="myJobs"></div>';jobs.insertBefore(c,document.getElementById('jobsList'))}
+ const pro=document.getElementById('proForm');if(pro&&!document.getElementById('photoBox')){const d=document.createElement('div');d.id='photoBox';d.innerHTML='<h3>Fotos de mis trabajos</h3><p class="lead">Mostrá trabajos reales para que los clientes puedan conocerte mejor.</p><input id="proPhoto" type="file" accept="image/jpeg,image/png,image/webp"><input id="photoCaption" placeholder="Descripción de la foto (opcional)"><button type="button" onclick="resolveUploadPhotoAction()">Subir foto</button><div id="photoMsg"></div><div id="ownPhotos"></div>';pro.appendChild(d)}
+ const pd=document.getElementById('professionalDetail');if(pd&&!document.getElementById('professionalPhotos')){const sec=document.createElement('div');sec.innerHTML='<div class="section-title"><h2>Trabajos realizados</h2></div><div id="professionalPhotos"></div>';pd.parentElement.insertAdjacentElement('afterend',sec)}
+}
+window.resolveEnhanceAccount=async function(){if(profile?.role==='professional')await resolveRefreshOwnPhotos()}
+window.resolveEnhanceJobs=async function(){const card=document.getElementById('jobCreateCard');if(!card)return;card.classList.toggle('hidden',!session||profile?.role==='professional');if(session&&profile?.role!=='professional')await resolveLoadMyJobs()}
+const oldOpen=window.resolveOpenProfessional;window.resolveOpenProfessional=async function(p){await oldOpen(p);await resolveRenderPublicPhotos(p.id)};
+document.addEventListener('DOMContentLoaded',insertUI);setTimeout(insertUI,0);
+})();
