@@ -1,8 +1,8 @@
 {
   "name": "RESOLVÉ",
   "short_name": "RESOLVÉ",
-  "description": "Encontrá profesionales, pedí presupuesto y resolvé.",
-  "start_url": "/",
+  "description": "Encontrá profesionales, pedí presupuesto o publicá tus servicios en RESOLVÉ.",
+  "start_url": "/?src=pwa_instalada",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f7f3eb",
@@ -14,5 +14,11 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "id": "/",
+  "categories": [
+    "business",
+    "lifestyle",
+    "utilities"
   ]
 }
