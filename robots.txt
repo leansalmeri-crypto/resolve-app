@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /v3/admin-dashboard.html
+Disallow: /v3/reset-password.html
+Disallow: /v3/auth-callback.html
+
+Sitemap: https://resolve-app-eight.vercel.app/sitemap.xml
